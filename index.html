@@ -585,11 +585,25 @@ function makeTextField(f){
   label.textContent = f.label + (f.skippable ? '（任意）' : '');
   wrap.appendChild(label);
   const input = f.type === 'textarea' ? document.createElement('textarea') : document.createElement('input');
-  if(f.type !== 'textarea') input.type = f.type === 'number' ? 'number' : 'text';
+  
+  if(f.type !== 'textarea') {
+    input.type = f.type || 'text';
+  }
   if(f.placeholder) input.placeholder = f.placeholder;
+
+  // カレンダー(date)の場合は今日の日付を初期セット
+  if (f.type === 'date') {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    input.value = `${yyyy}-${mm}-${dd}`;
+  }
+
   input.addEventListener('input', ()=>refreshNextEnabled(STEPS[stepIndex]));
   wrap.appendChild(input);
   return { el: wrap, getValue: ()=> input.value.trim(), focusEl: input };
+}
 }
 
 function makeSelectField(f){
