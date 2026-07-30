@@ -98,11 +98,10 @@
   .field{margin-bottom:12px;}
   .field:last-child{margin-bottom:0;}
   .field label{display:block; font-size:12px; color:var(--sub); margin-bottom:6px; letter-spacing:.02em;}
-.field input[type=text], .field input[type=number], .field input[type=date], .field textarea{
+  .field input[type=text], .field input[type=number], .field textarea{
     width:100%; background:var(--panel2); border:1px solid var(--line); border-radius:9px;
     padding:10px 11px; color:var(--text); font-size:15px; font-family:inherit;
-    color-scheme: dark;
-   }
+  }
   .field input:focus, .field textarea:focus{outline:none; border-color:var(--ice);}
   .field textarea{resize:vertical; min-height:64px;}
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
@@ -236,18 +235,11 @@ const STEPS = [];
 function addStep(s){ STEPS.push(s); }
 
 addStep({section:"基本情報", bot:"まず、シート作成日を教えてください。", fields:[
-  {key:"date", label:"作成日", type:"date"}
-], summary:a=>{
-  if(!a.date) return "";
-  const [y, m, d] = a.date.split('-');
-  return `${y}年${parseInt(m,10)}月${parseInt(d,10)}日`;
-},
-  apply:(a,w)=>{
-    if(!a.date) return;
-    const [y, m, d] = a.date.split('-');
-    w.sheet = setCell(w.sheet, "U1", `${y}年${parseInt(m,10)}月${parseInt(d,10)}日 作成`);
-  }
-});
+  {key:"y", label:"年（西暦）", type:"number", placeholder:"2026"},
+  {key:"m", label:"月", type:"number", placeholder:"7"},
+  {key:"d", label:"日", type:"number", placeholder:"30"},
+], summary:a=>`${a.y}年${a.m}月${a.d}日`,
+  apply:(a,w)=>{ w.sheet = setCell(w.sheet, "U1", `${a.y}年${a.m}月${a.d}日　作成`); }});
 
 addStep({section:"基本情報", bot:"既設機種と、新規で選定する機種の種別を選んでください。", fields:[
   {key:"old", label:"既設機種", type:"select", options:["吸収式","GHP","PAC","その他"]},
@@ -502,32 +494,17 @@ addStep({section:"その他", bot:"その他、伝えておきたい情報があ
   apply:(a,w)=>{ if(a.note) w.sheet = setCell(w.sheet, "D53", a.note); }});
 
 addStep({section:"工事指定", bot:"最後に、工事希望日と曜日、時間帯を教えてください。", fields:[
-  {key:"date", label:"工事希望日", type:"date", skippable:true},
+  {key:"date", label:"工事希望日", type:"text", placeholder:"10月15日", skippable:true},
+  {key:"weekday", label:"曜日", type:"text", placeholder:"月", skippable:true},
   {key:"start", label:"開始（時）", type:"number", placeholder:"9", skippable:true},
   {key:"end", label:"終了（時）", type:"number", placeholder:"17", skippable:true},
-], summary:a=>{
-  let dStr = "-";
-  let wStr = "-";
-  if (a.date) {
-    const dObj = new Date(a.date);
-    dStr = `${dObj.getMonth() + 1}月${dObj.getDate()}日`;
-    wStr = ["日","月","火","水","木","金","土"][dObj.getDay()];
-  }
-  return `${dStr}（${wStr}）${a.start||"-"}時〜${a.end||"-"}時`;
-},
+], summary:a=>`${a.date||"-"}（${a.weekday||"-"}）${a.start||"-"}時〜${a.end||"-"}時`,
   apply:(a,w)=>{
-    if(a.date) {
-       const dObj = new Date(a.date);
-       const m = dObj.getMonth() + 1;
-       const d = dObj.getDate();
-       const wd = ["日","月","火","水","木","金","土"][dObj.getDay()];
-       w.sheet = setCell(w.sheet, "G62", `${m}月${d}日`);
-       w.sheet = setCell(w.sheet, "P62", wd + "曜日");
-    }
+    if(a.date) w.sheet = setCell(w.sheet, "G62", a.date);
+    if(a.weekday) w.sheet = setCell(w.sheet, "P62", a.weekday+"曜日");
     if(a.start) w.sheet = setCell(w.sheet, "R62", a.start+"時");
     if(a.end) w.sheet = setCell(w.sheet, "Z62", a.end+"時まで");
-  }
-});
+  }});
 
 /* ===================== アプリロジック ===================== */
 const main = document.getElementById('main');
@@ -607,25 +584,11 @@ function makeTextField(f){
   label.textContent = f.label + (f.skippable ? '（任意）' : '');
   wrap.appendChild(label);
   const input = f.type === 'textarea' ? document.createElement('textarea') : document.createElement('input');
-  
-  if(f.type !== 'textarea') {
-    input.type = f.type || 'text';
-  }
+  if(f.type !== 'textarea') input.type = f.type === 'number' ? 'number' : 'text';
   if(f.placeholder) input.placeholder = f.placeholder;
-
-  // カレンダー(date)の場合は今日の日付を初期セット
-  if (f.type === 'date') {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    input.value = `${yyyy}-${mm}-${dd}`;
-  }
-
   input.addEventListener('input', ()=>refreshNextEnabled(STEPS[stepIndex]));
   wrap.appendChild(input);
   return { el: wrap, getValue: ()=> input.value.trim(), focusEl: input };
-}
 }
 
 function makeSelectField(f){
