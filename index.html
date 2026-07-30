@@ -231,7 +231,6 @@ function setCell(xml, ref, text){
 }
 
 /* ===================== 質問ステップ定義 ===================== */
-// type: text / number / select / group(複数fieldを1カードにまとめる) / optional(トグルで表示するサブ項目)
 const STEPS = [];
 function addStep(s){ STEPS.push(s); }
 
@@ -248,6 +247,7 @@ addStep({section:"基本情報", bot:"まず、シート作成日を教えてく
     w.sheet = setCell(w.sheet, "U1", `${y}年${parseInt(m,10)}月${parseInt(d,10)}日 作成`);
   }
 });
+
 addStep({section:"基本情報", bot:"既設機種と、新規で選定する機種の種別を選んでください。", fields:[
   {key:"old", label:"既設機種", type:"select", options:["吸収式","GHP","PAC","その他"]},
   {key:"nw", label:"新規選定機種", type:"select", options:["吸収式","GHP","PAC","その他"]},
@@ -266,7 +266,7 @@ addStep({section:"基本情報", bot:"情報提供者のお名前と、情報が
   {key:"d", label:"日", type:"number", placeholder:"30"},
 ], summary:a=>`${a.name}様（${a.m}/${a.d}）`,
   apply:(a,w)=>{
-    w.sheet = setCell(w.sheet, "G11", a.name + "　様");
+    w.sheet = setCell(w.sheet, "G11", a.name + " 様");
     w.sheet = setCell(w.sheet, "U11", a.m + "月");
     w.sheet = setCell(w.sheet, "X11", a.d + "日");
   }});
@@ -322,7 +322,7 @@ addStep({section:"現場情報", bot:"現場の担当者名と電話番号を教
 addStep({section:"選定機種（既設）", bot:"既設機器のメーカーを教えてください。", fields:[
   {key:"maker", label:"メーカー名", type:"text", placeholder:"パナソニック"},
 ], summary:a=>a.maker+"製",
-  apply:(a,w)=>{ w.sheet = setCell(w.sheet, "D22", "既設機器（メーカー：" + a.maker + "　製）"); }});
+  apply:(a,w)=>{ w.sheet = setCell(w.sheet, "D22", "既設機器（メーカー：" + a.maker + " 製）"); }});
 
 addStep({section:"選定機種（既設）", bot:"既設の室外機（1台目）の型式・仕様と台数を教えてください。", fields:[
   {key:"spec", label:"型式・仕様", type:"text", placeholder:"〇〇-XXX"},
@@ -372,7 +372,7 @@ addStep({section:"選定機種（既設）", bot:"既設機器で「その他」
 addStep({section:"選定機種（新設）", bot:"新設で選定する機器のメーカーを教えてください。", fields:[
   {key:"maker", label:"メーカー名", type:"text", placeholder:"パナソニック"},
 ], summary:a=>a.maker+"製",
-  apply:(a,w)=>{ w.sheet = setCell(w.sheet, "S22", "新設選定機器（メーカー：" + a.maker + "　製）"); }});
+  apply:(a,w)=>{ w.sheet = setCell(w.sheet, "S22", "新設選定機器（メーカー：" + a.maker + " 製）"); }});
 
 addStep({section:"選定機種（新設）", bot:"新設の室外機（1台目）の型式・仕様と台数を教えてください。", fields:[
   {key:"spec", label:"型式・仕様", type:"text", placeholder:"〇〇-XXX"},
@@ -423,7 +423,7 @@ addStep({section:"オプション", bot:"オプション（リモコン・加湿
   {key:"detail", label:"オプション詳細", type:"textarea", skippable:true},
 ], summary:a=>a.detail||"なし",
   apply:(a,w)=>{
-    if(a.detail) w.sheet = setCell(w.sheet, "F33", "（リモコン・加湿器・防振架台、防雪フード等）　"+a.detail);
+    if(a.detail) w.sheet = setCell(w.sheet, "F33", "（リモコン・加湿器・防振架台、防雪フード等） "+a.detail);
   }});
 
 addStep({section:"現場情報", bot:"搬入出経路を選んでください。", fields:[
