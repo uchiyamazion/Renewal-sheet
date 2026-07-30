@@ -98,10 +98,11 @@
   .field{margin-bottom:12px;}
   .field:last-child{margin-bottom:0;}
   .field label{display:block; font-size:12px; color:var(--sub); margin-bottom:6px; letter-spacing:.02em;}
-  .field input[type=text], .field input[type=number], .field textarea{
+.field input[type=text], .field input[type=number], .field input[type=date], .field textarea{
     width:100%; background:var(--panel2); border:1px solid var(--line); border-radius:9px;
     padding:10px 11px; color:var(--text); font-size:15px; font-family:inherit;
-  }
+    color-scheme: dark;
+   }
   .field input:focus, .field textarea:focus{outline:none; border-color:var(--ice);}
   .field textarea{resize:vertical; min-height:64px;}
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
