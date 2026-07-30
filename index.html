@@ -501,17 +501,32 @@ addStep({section:"その他", bot:"その他、伝えておきたい情報があ
   apply:(a,w)=>{ if(a.note) w.sheet = setCell(w.sheet, "D53", a.note); }});
 
 addStep({section:"工事指定", bot:"最後に、工事希望日と曜日、時間帯を教えてください。", fields:[
-  {key:"date", label:"工事希望日", type:"text", placeholder:"10月15日", skippable:true},
-  {key:"weekday", label:"曜日", type:"text", placeholder:"月", skippable:true},
+  {key:"date", label:"工事希望日", type:"date", skippable:true},
   {key:"start", label:"開始（時）", type:"number", placeholder:"9", skippable:true},
   {key:"end", label:"終了（時）", type:"number", placeholder:"17", skippable:true},
-], summary:a=>`${a.date||"-"}（${a.weekday||"-"}）${a.start||"-"}時〜${a.end||"-"}時`,
+], summary:a=>{
+  let dStr = "-";
+  let wStr = "-";
+  if (a.date) {
+    const dObj = new Date(a.date);
+    dStr = `${dObj.getMonth() + 1}月${dObj.getDate()}日`;
+    wStr = ["日","月","火","水","木","金","土"][dObj.getDay()];
+  }
+  return `${dStr}（${wStr}）${a.start||"-"}時〜${a.end||"-"}時`;
+},
   apply:(a,w)=>{
-    if(a.date) w.sheet = setCell(w.sheet, "G62", a.date);
-    if(a.weekday) w.sheet = setCell(w.sheet, "P62", a.weekday+"曜日");
+    if(a.date) {
+       const dObj = new Date(a.date);
+       const m = dObj.getMonth() + 1;
+       const d = dObj.getDate();
+       const wd = ["日","月","火","水","木","金","土"][dObj.getDay()];
+       w.sheet = setCell(w.sheet, "G62", `${m}月${d}日`);
+       w.sheet = setCell(w.sheet, "P62", wd + "曜日");
+    }
     if(a.start) w.sheet = setCell(w.sheet, "R62", a.start+"時");
     if(a.end) w.sheet = setCell(w.sheet, "Z62", a.end+"時まで");
-  }});
+  }
+});
 
 /* ===================== アプリロジック ===================== */
 const main = document.getElementById('main');
