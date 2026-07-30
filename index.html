@@ -260,15 +260,21 @@ addStep({section:"基本情報", bot:"既設機種と、新規で選定する機
     w.sheet = setCell(w.sheet, newMap[a.nw], "◯"+oldLabel[a.nw]);
   }});
 
-addStep({section:"基本情報", bot:"情報提供者のお名前と、情報が発生した月日を教えてください。", fields:[
+addStep({section:"基本情報", bot:"情報提供者のお名前と、情報発生日を教えてください。", fields:[
   {key:"name", label:"情報提供者名", type:"text", placeholder:"山田太郎"},
-  {key:"m", label:"月", type:"number", placeholder:"7"},
-  {key:"d", label:"日", type:"number", placeholder:"30"},
-], summary:a=>`${a.name}様（${a.m}/${a.d}）`,
+  {key:"date", label:"情報発生日", type:"date"}
+], summary:a=>{
+  if(!a.date) return `${a.name}様`;
+  const [y, m, d] = a.date.split('-');
+  return `${a.name}様（${parseInt(m,10)}月${parseInt(d,10)}日）`;
+},
   apply:(a,w)=>{
     w.sheet = setCell(w.sheet, "G11", a.name + " 様");
-    w.sheet = setCell(w.sheet, "U11", a.m + "月");
-    w.sheet = setCell(w.sheet, "X11", a.d + "日");
+    if(a.date){
+      const [y, m, d] = a.date.split('-');
+      w.sheet = setCell(w.sheet, "U11", parseInt(m,10) + "月");
+      w.sheet = setCell(w.sheet, "X11", parseInt(d,10) + "日");
+    }
   }});
 
 addStep({section:"基本情報", bot:"情報発生源を選んでください。", fields:[
