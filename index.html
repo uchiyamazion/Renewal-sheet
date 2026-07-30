@@ -98,9 +98,10 @@
   .field{margin-bottom:12px;}
   .field:last-child{margin-bottom:0;}
   .field label{display:block; font-size:12px; color:var(--sub); margin-bottom:6px; letter-spacing:.02em;}
-  .field input[type=text], .field input[type=number], .field textarea{
+  .field input[type=text], .field input[type=number], .field input[type=date], .field textarea{
     width:100%; background:var(--panel2); border:1px solid var(--line); border-radius:9px;
     padding:10px 11px; color:var(--text); font-size:15px; font-family:inherit;
+    color-scheme: dark;
   }
   .field input:focus, .field textarea:focus{outline:none; border-color:var(--ice);}
   .field textarea{resize:vertical; min-height:64px;}
@@ -235,12 +236,18 @@ const STEPS = [];
 function addStep(s){ STEPS.push(s); }
 
 addStep({section:"基本情報", bot:"まず、シート作成日を教えてください。", fields:[
-  {key:"y", label:"年（西暦）", type:"number", placeholder:"2026"},
-  {key:"m", label:"月", type:"number", placeholder:"7"},
-  {key:"d", label:"日", type:"number", placeholder:"30"},
-], summary:a=>`${a.y}年${a.m}月${a.d}日`,
-  apply:(a,w)=>{ w.sheet = setCell(w.sheet, "U1", `${a.y}年${a.m}月${a.d}日　作成`); }});
-
+  {key:"date", label:"作成日", type:"date"}
+], summary:a=>{
+  if(!a.date) return "";
+  const [y, m, d] = a.date.split('-');
+  return `${y}年${parseInt(m,10)}月${parseInt(d,10)}日`;
+},
+  apply:(a,w)=>{
+    if(!a.date) return;
+    const [y, m, d] = a.date.split('-');
+    w.sheet = setCell(w.sheet, "U1", `${y}年${parseInt(m,10)}月${parseInt(d,10)}日 作成`);
+  }
+});
 addStep({section:"基本情報", bot:"既設機種と、新規で選定する機種の種別を選んでください。", fields:[
   {key:"old", label:"既設機種", type:"select", options:["吸収式","GHP","PAC","その他"]},
   {key:"nw", label:"新規選定機種", type:"select", options:["吸収式","GHP","PAC","その他"]},
@@ -584,8 +591,21 @@ function makeTextField(f){
   label.textContent = f.label + (f.skippable ? '（任意）' : '');
   wrap.appendChild(label);
   const input = f.type === 'textarea' ? document.createElement('textarea') : document.createElement('input');
-  if(f.type !== 'textarea') input.type = f.type === 'number' ? 'number' : 'text';
+  
+  if(f.type !== 'textarea') {
+    input.type = f.type || 'text';
+  }
   if(f.placeholder) input.placeholder = f.placeholder;
+
+  // カレンダー(date)の場合は今日の日付を初期セット
+  if (f.type === 'date') {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    input.value = `${yyyy}-${mm}-${dd}`;
+  }
+
   input.addEventListener('input', ()=>refreshNextEnabled(STEPS[stepIndex]));
   wrap.appendChild(input);
   return { el: wrap, getValue: ()=> input.value.trim(), focusEl: input };
