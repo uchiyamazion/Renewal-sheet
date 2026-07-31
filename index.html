@@ -375,11 +375,17 @@ addStep({section:"選定機種（既設）", bot:"既設機器で「その他」
     w.sheet = setCell(w.sheet, "P31", String(a.qty));
   }});
 
-addStep({section:"選定機種（新設）", bot:"新設で選定する機器のメーカーを教えてください。", fields:[
+addStep({section:"選定機種（新設）", bot:`新設で選定する機器のメーカーを教えてください。<br>
+<div style="margin-top:12px; font-size:12.5px; background:rgba(0,0,0,0.2); padding:10px 12px; border-radius:8px; line-height:1.8;">
+  <b style="color:var(--sub);">▼ 各社リプレイス検索（別窓で開きます）</b><br>
+  ・<a href="https://hvac.panasonic.com/search/" target="_blank" style="color:var(--ice); text-decoration:underline;">Panasonic (P-SPEC)</a><br>
+  ・<a href="https://www.mitsubishielectric.co.jp/ldg/wink/" target="_blank" style="color:var(--ice); text-decoration:underline;">三菱電機 (WIN2K)</a><br>
+  ・<a href="https://www.daikinaircon.com/app/replace/" target="_blank" style="color:var(--ice); text-decoration:underline;">ダイキン</a><br>
+  ・<a href="https://www.hitachi-gls.co.jp/products/aircon/biz/replace/" target="_blank" style="color:var(--ice); text-decoration:underline;">日立</a>
+</div>`, fields:[
   {key:"maker", label:"メーカー名", type:"text", placeholder:"パナソニック"},
 ], summary:a=>a.maker+"製",
   apply:(a,w)=>{ w.sheet = setCell(w.sheet, "S22", "新設選定機器（メーカー：" + a.maker + " 製）"); }});
-
 addStep({section:"選定機種（新設）", bot:"新設の室外機（1台目）の型式・仕様と台数を教えてください。", fields:[
   {key:"spec", label:"型式・仕様", type:"text", placeholder:"〇〇-XXX"},
   {key:"qty", label:"台数", type:"number", placeholder:"1"},
