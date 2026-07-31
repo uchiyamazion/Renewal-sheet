@@ -325,8 +325,8 @@ addStep({section:"現場情報", bot:"現場の担当者名と電話番号を教
     if(a.tel) w.sheet = setCell(w.sheet, "AA19", "電話："+a.tel);
   }});
 
-addStep({section:"選定機種（既設）", bot:"既設機器のメーカーを教えてください。", fields:[
-  {key:"maker", label:"メーカー名", type:"text", placeholder:"パナソニック"},
+addStep({section:"選定機種（既設）", bot:"既設機器のメーカーを選んでください。", fields:[
+  {key:"maker", label:"メーカー名", type:"select", options:["ダイキン","三菱電機","パナソニック","日立","東芝","三菱重工","その他"]},
 ], summary:a=>a.maker+"製",
   apply:(a,w)=>{ w.sheet = setCell(w.sheet, "D22", "既設機器（メーカー：" + a.maker + " 製）"); }});
 
@@ -448,8 +448,8 @@ addStep({section:"現場情報", bot:"搬入出経路を選んでください。
     w.sheet = setCell(w.sheet, "H38", v);
   }});
 
-addStep({section:"現場情報", bot:"冷媒ガスの種類と回収量、処理方法を教えてください。", fields:[
-  {key:"gas", label:"ガス種", type:"text", placeholder:"R410A"},
+addStep({section:"現場情報", bot:"冷媒ガスの種類を選び、回収量と処理方法を入力してください。", fields:[
+  {key:"gas", label:"ガス種", type:"select", options:["R-22","R-32","R-410A","R-404A","R-134a","R-407C"]},
   {key:"amount", label:"回収量（kg）", type:"number", placeholder:"5"},
   {key:"method", label:"処理方法", type:"select", options:["ポンプダウン","現地回収"]},
 ], summary:a=>`${a.gas} / ${a.amount}kg / ${a.method}`,
@@ -458,7 +458,8 @@ addStep({section:"現場情報", bot:"冷媒ガスの種類と回収量、処理
     w.sheet = setCell(w.sheet, "M40", "回収量："+a.amount);
     if(a.method === "ポンプダウン"){ w.sheet = setCell(w.sheet, "T40", "◯ポンプダウン"); }
     else { w.sheet = setCell(w.sheet, "X40", "◯現地回収"); }
-  }});
+  }
+});
 
 addStep({section:"現場情報", bot:"新設時の冷媒ガス追加充填量を教えてください。", fields:[
   {key:"amount", label:"追加充填量（kg）", type:"number", placeholder:"0", skippable:true},
