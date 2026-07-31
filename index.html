@@ -568,7 +568,9 @@ function botMsg(text, tag){
     b.appendChild(t);
     b.appendChild(document.createElement('br'));
   }
-  b.appendChild(document.createTextNode(text));
+  // ▼ 変更箇所：文字としてではなく、HTML（リンク等）として画面に挿入する
+  b.insertAdjacentHTML('beforeend', text);
+  
   wrap.appendChild(b);
   main.appendChild(wrap);
 }
